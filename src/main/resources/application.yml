@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:6666/menu-manager
+    username: menu-manager
+    password: "1"
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+# Настройки Liquibase
+liquibase:
+  enabled: true
+  change-log: classpath:db/db.changelog-master.yaml # основной changelog файл
+
+  #  security:
+  #    user:
+  #      name: admin  # Дефолтный пользователь для тестов (опционально)
+  #      password: password
+
+  server:
+    port: 8080
+    servlet:
+      context-path: /api  # Если нужно базовый префикс для всех API
+
+  springdoc:
+    api-docs:
+      path: /v3/api-docs
+    swagger-ui:
+      path: /swagger-ui.html
+      enabled: true
+
+  logging:
+    level:
+      org.springframework.web: DEBUG
+      org.springframework.security: DEBUG
+      com.example.demo: TRACE
