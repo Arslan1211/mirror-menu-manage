@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import com.example.demo.entity.enums.DishCategory;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +27,7 @@ public class Dish {
     private int price;
     private int quantity;
 
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

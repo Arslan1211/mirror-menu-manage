@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class DishNotFoundException extends RuntimeException {
     public DishNotFoundException(Long dishId) {
-        super("Dish not found with id: " + dishId);
+        super("Dish not found with id or you don't have permission: " + dishId);
     }
 }

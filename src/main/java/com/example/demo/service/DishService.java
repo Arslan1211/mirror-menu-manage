@@ -1,18 +1,15 @@
 package com.example.demo.service;
 
 import com.example.demo.entity.Dish;
+import com.example.demo.entity.User;
 import com.example.demo.exeption.DishNotFoundException;
-import com.example.demo.exeption.UnauthorizedEditException;
 import com.example.demo.repository.DishRepository;
-import com.example.demo.service.dto.CreateDishRequest;
-import com.example.demo.service.dto.DishDTO;
-import com.example.demo.service.dto.UpdateDishRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Service
+/*@Service
 public class DishService {
     private final DishRepository dishRepository;
 
@@ -45,9 +42,9 @@ public class DishService {
         Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new DishNotFoundException(dishId));
 
-        /*if (!dish.getCreatedBy().equals(userId)) {
+        *//*if (!dish.getCreatedBy().equals(userId)) {
             throw new UnauthorizedEditException("You can only edit your own dishes");
-        }*/
+        }*//*
 
         dish.setName(request.getName());
         dish.setDescription(request.getDescription());
@@ -63,9 +60,9 @@ public class DishService {
         Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new DishNotFoundException(dishId));
 
-        /*if (!dish.getCreatedBy().equals(userId)) {
+        *//*if (!dish.getCreatedBy().equals(userId)) {
             throw new UnauthorizedEditException("You can only edit your own dishes");
-        }*/
+        }*//*
 
         dishRepository.deleteById(dishId);
     }
@@ -87,5 +84,44 @@ public class DishService {
         dto.setCreatedAt(dish.getCreatedAt());
         dto.setCreatedBy(dish.getCreatedBy());
         return dto;
+    }
+}*/
+
+@Service
+@RequiredArgsConstructor
+public class DishService {
+    private final DishRepository dishRepository;
+
+    public List<Dish> getAllDishesByUser(Long userId) {
+        return dishRepository.findByCreatedBy(userId);
+    }
+
+    public Dish createDish(Dish dish, User user) {
+        dish.setCreatedBy(user.getId());
+        return dishRepository.save(dish);
+    }
+
+    public Dish updateDish(Long dishId, Dish dishDetails, User user) {
+        Dish dish = dishRepository.findByIdAndCreatedBy(dishId, user)
+                .orElseThrow(() -> new DishNotFoundException(dishId));
+
+        dish.setName(dishDetails.getName());
+        dish.setDescription(dishDetails.getDescription());
+        dish.setPrice(dishDetails.getPrice());
+        dish.setQuantity(dishDetails.getQuantity());
+
+        return dishRepository.save(dish);
+    }
+
+    public void deleteDish(Long dishId, User user) {
+        Dish dish = dishRepository.findByIdAndCreatedBy(dishId, user)
+                .orElseThrow(() -> new DishNotFoundException(dishId));
+
+        dishRepository.delete(dish);
+    }
+
+    public Dish getDishById(Long dishId) {
+        return dishRepository.findById(dishId)
+                .orElseThrow(() -> new DishNotFoundException(dishId));
     }
 }

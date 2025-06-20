@@ -1,14 +1,15 @@
 package com.example.demo.repository;
 
 import com.example.demo.entity.Dish;
-import com.example.demo.service.dto.DishDTO;
+import com.example.demo.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DishRepository extends JpaRepository<Dish, Long> {
-    List<Dish> findByCreatedBy(Long createdBy);
 
+    List<Dish> findByCreatedBy(Long user);
 
-    DishDTO deleteDishById(Long id);
+    Optional<Dish> findByIdAndCreatedBy(Long id, User user);
 }
