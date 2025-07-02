@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.User;
 import com.example.demo.service.AuthService;
+import com.example.demo.service.dto.AuthResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody User user) {
-        return ResponseEntity.ok(authService.login(user.getUsername(), user.getPassword()));
+    public ResponseEntity<AuthResponse> login(@RequestBody User user) {
+        String token = authService.login(user.getUsername(), user.getPassword());
+        return ResponseEntity.ok(new AuthResponse(user.getUsername(), token));
     }
 }
