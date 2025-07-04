@@ -1,9 +1,10 @@
 CREATE TABLE users (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     username VARCHAR(25) NOT NULL UNIQUE,
-    password VARCHAR(60) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    role VARCHAR(50)
+    password VARCHAR(60) NOT NULL
+--     ,
+--     email VARCHAR(255) NOT NULL UNIQUE,
+--     role VARCHAR(50)
 );
 
 CREATE TABLE dishes (

@@ -1,7 +1,7 @@
 -- 1. Сначала создаем пользователей с паролем pass1 для ivan и pass2 для roman
-INSERT INTO users (username, password, email, role) VALUES
-    ('ivan', 'pass1', 'van@example.com', 'ROLE_USER'),
-    ('roman', 'pass2', 'roma@example.com', 'ROLE_USER');
+INSERT INTO users (username, password) VALUES
+    ('ivan', 'pass1'),
+    ('roman', 'pass2');
 
 -- 2. Добавление блюд (created_by использует ID первого пользователя)
 INSERT INTO dishes (name, description, category, price, quantity, created_by) VALUES

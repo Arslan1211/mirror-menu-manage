@@ -42,6 +42,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (request.getServletPath().contains("/v3/api-docs") ||
+                request.getServletPath().contains("/swagger-ui")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         jwt = authHeader.substring(7);
         username = jwtUtils.extractUsername(jwt);
         log.info(username);

@@ -17,8 +17,8 @@ public class DishController {
     private final DishService dishService;
 
     @GetMapping
-    public ResponseEntity<List<Dish>> getAllDishes(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(dishService.getAllDishesByUser(user.getId()));
+    public ResponseEntity<List<Dish>> getAllDishes() {
+        return ResponseEntity.ok(dishService.getAllDishes());
     }
 
     @PostMapping

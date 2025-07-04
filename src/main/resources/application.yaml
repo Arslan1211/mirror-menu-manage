@@ -37,9 +37,9 @@ jwt:
 
   springdoc:
     api-docs:
-      path: /v3/api-docs
+      path: /v3/api-docs       # Путь к JSON OpenAPI
     swagger-ui:
-      path: /swagger-ui.html
+      path: /swagger-ui.html   # Путь к Swagger UI
       enabled: true
 
   logging:
