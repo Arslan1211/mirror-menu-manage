@@ -3,37 +3,45 @@ package com.example.demo.service;
 import com.example.demo.entity.Dish;
 import com.example.demo.entity.User;
 import com.example.demo.exeption.DishNotFoundException;
+import com.example.demo.mapper.DishMapper;
 import com.example.demo.repository.DishRepository;
+import com.example.demo.dto.CreateDishRequest;
+import com.example.demo.dto.DishDTO;
+import com.example.demo.dto.UpdateDishRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class DishService {
     private final DishRepository dishRepository;
+    private final DishMapper dishMapper;
 
-    public List<Dish> getAllDishes() {
-        return dishRepository.findAll();
+    public List<DishDTO> getAllDishes() {
+        return dishRepository.findAll().stream()
+                .map(dishMapper::toDto)
+                .toList();
     }
 
-    public Dish createDish(Dish dish, User user) {
+    public DishDTO createDish(CreateDishRequest request, User user) {
+        Dish dish = dishMapper.toEntity(request);
         dish.setCreatedBy(user.getId());
-        return dishRepository.save(dish);
+        dish.setCreatedAt(LocalDateTime.now());
+        dish.setStopped(false);
+        Dish savedDish = dishRepository.save(dish);
+        return dishMapper.toDto(savedDish);
     }
 
-    public Dish updateDish(Long dishId, Dish dishDetails, User user) {
+    public DishDTO updateDish(Long dishId, UpdateDishRequest request, User user) {
         Dish dish = dishRepository.findByIdAndCreatedBy(dishId, user.getId())
                 .orElseThrow(() -> new DishNotFoundException(dishId));
 
-        dish.setName(dishDetails.getName());
-        dish.setDescription(dishDetails.getDescription());
-        dish.setCreatedBy(user.getId());
-        dish.setPrice(dishDetails.getPrice());
-        dish.setQuantity(dishDetails.getQuantity());
-
-        return dishRepository.save(dish);
+        dishMapper.updateEntityFromRequest(request, dish);
+        Dish updatedDish = dishRepository.save(dish);
+        return dishMapper.toDto(updatedDish);
     }
 
     public void deleteDish(Long dishId, User user) {
@@ -43,8 +51,9 @@ public class DishService {
         dishRepository.delete(dish);
     }
 
-    public Dish getDishById(Long dishId) {
-        return dishRepository.findById(dishId)
+    public DishDTO getDishById(Long dishId) {
+        Dish dish = dishRepository.findById(dishId)
                 .orElseThrow(() -> new DishNotFoundException(dishId));
+        return dishMapper.toDto(dish);
     }
 }

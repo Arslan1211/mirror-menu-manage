@@ -27,6 +27,9 @@ public class Dish {
     private int price;
     private int quantity;
 
+    @Transient
+    private boolean isStopped = false;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

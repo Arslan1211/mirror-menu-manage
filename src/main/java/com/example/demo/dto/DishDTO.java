@@ -1,4 +1,4 @@
-package com.example.demo.service.dto;
+package com.example.demo.dto;
 
 import com.example.demo.entity.enums.DishCategory;
 import lombok.Data;
@@ -16,4 +16,9 @@ public class DishDTO {
     private boolean isStopped;
     private LocalDateTime createdAt;
     private Long createdBy;
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+        this.isStopped = (quantity == 0); // Автоматически обновляем флаг
+    }
 }

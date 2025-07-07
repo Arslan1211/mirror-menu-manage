@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Dish;
 import com.example.demo.entity.User;
 import com.example.demo.service.DishService;
+import com.example.demo.dto.CreateDishRequest;
+import com.example.demo.dto.DishDTO;
+import com.example.demo.dto.UpdateDishRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,30 +20,34 @@ public class DishController {
     private final DishService dishService;
 
     @GetMapping
-    public ResponseEntity<List<Dish>> getAllDishes() {
+    public ResponseEntity<List<DishDTO>> getAllDishes() {
         return ResponseEntity.ok(dishService.getAllDishes());
     }
 
     @PostMapping
-    public ResponseEntity<Dish> createDish(@RequestBody Dish dish, @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(dishService.createDish(dish, user));
+    public ResponseEntity<DishDTO> createDish(
+            @Valid @RequestBody CreateDishRequest request,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(dishService.createDish(request, user));
     }
 
     @GetMapping("/{dishId}")
-    public Dish getDish(@PathVariable("dishId") Long dishId) {
-        return dishService.getDishById(dishId);
+    public ResponseEntity<DishDTO> getDish(@PathVariable("dishId") Long dishId) {
+        return ResponseEntity.ok(dishService.getDishById(dishId));
     }
 
     @PutMapping("/{dishId}")
-    public ResponseEntity<Dish> updateDish(
+    public ResponseEntity<DishDTO> updateDish(
             @PathVariable("dishId") Long dishId,
-            @RequestBody Dish dish,
+            @Valid @RequestBody UpdateDishRequest request,
             @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(dishService.updateDish(dishId, dish, user));
+        return ResponseEntity.ok(dishService.updateDish(dishId, request, user));
     }
 
     @DeleteMapping("/{dishId}")
-    public ResponseEntity<Void> deleteDish(@PathVariable Long dishId, @AuthenticationPrincipal User user) {
+    public ResponseEntity<Void> deleteDish(
+            @PathVariable Long dishId,
+            @AuthenticationPrincipal User user) {
         dishService.deleteDish(dishId, user);
         return ResponseEntity.noContent().build();
     }
