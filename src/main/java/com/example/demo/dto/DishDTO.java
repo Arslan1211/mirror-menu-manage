@@ -1,7 +1,6 @@
 package com.example.demo.dto;
 
 import com.example.demo.entity.enums.DishCategory;
-import com.example.demo.validation.EnumValid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -19,7 +18,6 @@ public class DishDTO {
     private String description;
 
     @NotNull(message = "Category cannot be null")
-    @EnumValid(enumClass = DishCategory.class, message = "Invalid dish category")
     private DishCategory category;
 
     @Min(value = 0, message = "Price cannot be negative")

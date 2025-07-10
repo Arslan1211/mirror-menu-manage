@@ -3,6 +3,7 @@ package com.example.demo.service;
 import com.example.demo.config.JwtUtils;
 import com.example.demo.entity.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,6 +36,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Авторизация пользователя - успешный сценарий")
     void login_Success() {
         // Arrange
         User user = new User();
@@ -56,6 +58,7 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Регистрация нового пользователя - успешный сценарий")
     void register_Success() {
         // Arrange
         User newUser = new User();

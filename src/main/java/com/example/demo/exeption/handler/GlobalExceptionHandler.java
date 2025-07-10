@@ -1,8 +1,10 @@
 package com.example.demo.exeption.handler;
 
 import com.example.demo.exeption.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -78,6 +80,28 @@ public class GlobalExceptionHandler {
         apiError.setMessage("Validation error");
         apiError.setTimestamp(LocalDateTime.now());
         apiError.setPath(request.getDescription(false).replace("uri=", ""));
+        apiError.setFieldErrors(fieldErrors);
+
+        return ResponseEntity.badRequest().body(apiError);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleValidationExceptions(
+            HttpMessageNotReadableException ex, WebRequest request) {
+
+        ApiError apiError = new ApiError();
+        apiError.setStatus(HttpStatus.BAD_REQUEST);
+        apiError.setMessage("Invalid JSON data");
+        apiError.setTimestamp(LocalDateTime.now());
+        apiError.setPath(request.getDescription(false).replace("uri=", ""));
+
+        Map<String, String> fieldErrors = new HashMap<>();
+        if (ex.getCause() instanceof JsonMappingException jsonEx) {
+            String fieldName = jsonEx.getPath().isEmpty() ? "request" : jsonEx.getPath().get(0).getFieldName();
+            fieldErrors.put(fieldName, jsonEx.getOriginalMessage());
+        } else {
+            fieldErrors.put("request", ex.getMessage());
+        }
         apiError.setFieldErrors(fieldErrors);
 
         return ResponseEntity.badRequest().body(apiError);
