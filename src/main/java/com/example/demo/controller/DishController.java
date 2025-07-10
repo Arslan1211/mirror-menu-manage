@@ -1,10 +1,10 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.User;
-import com.example.demo.service.DishService;
 import com.example.demo.dto.CreateDishRequest;
 import com.example.demo.dto.DishDTO;
 import com.example.demo.dto.UpdateDishRequest;
+import com.example.demo.entity.User;
+import com.example.demo.service.DishService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

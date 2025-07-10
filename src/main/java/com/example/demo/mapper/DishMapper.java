@@ -1,9 +1,9 @@
 package com.example.demo.mapper;
 
-import com.example.demo.entity.Dish;
 import com.example.demo.dto.CreateDishRequest;
 import com.example.demo.dto.DishDTO;
 import com.example.demo.dto.UpdateDishRequest;
+import com.example.demo.entity.Dish;
 import org.springframework.stereotype.Component;
 
 @Component
