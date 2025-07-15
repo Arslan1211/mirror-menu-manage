@@ -15,5 +15,16 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  app:
+    image: arslan1211/menu-manager:1
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/menu-manager
+      SPRING_DATASOURCE_USERNAME: menu-manager
+      SPRING_DATASOURCE_PASSWORD: 1
+    ports:
+      - "8080:8080"
+
 volumes:
   postgres_data:
