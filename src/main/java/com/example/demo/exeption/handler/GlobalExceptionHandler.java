@@ -1,17 +1,16 @@
 package com.example.demo.exeption.handler;
 
 import com.example.demo.exeption.*;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,10 +21,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDishNotFoundException(
             DishNotFoundException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                new Date(),
-                ex.getMessage(),
-                request.getDescription(false)
+                LocalDateTime.now(),
+                ex.getMessage()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
@@ -34,10 +31,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(
             UsernameNotFoundException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                new Date(),
-                ex.getMessage(),
-                request.getDescription(false)
+                LocalDateTime.now(),
+                ex.getMessage()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
@@ -46,10 +41,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUnauthorizedEditException(
             UnauthorizedEditException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.UNAUTHORIZED.value(),
-                new Date(),
-                ex.getMessage(),
-                request.getDescription(false)
+                LocalDateTime.now(),
+                ex.getMessage()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
@@ -58,52 +51,59 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUsernameExistsException(
             UsernameExistsException ex, WebRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.CONFLICT.value(),
-                new Date(),
-                ex.getMessage(),
-                request.getDescription(false)
+                LocalDateTime.now(),
+                ex.getMessage()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({
+            MethodArgumentNotValidException.class,
+            HttpMessageNotReadableException.class
+    })
     public ResponseEntity<ApiError> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
-
-        Map<String, String> fieldErrors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            fieldErrors.put(error.getField(), error.getDefaultMessage());
-        });
+            Exception ex, WebRequest request) {
 
         ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.BAD_REQUEST);
-        apiError.setMessage("Validation error");
         apiError.setTimestamp(LocalDateTime.now());
         apiError.setPath(request.getDescription(false).replace("uri=", ""));
-        apiError.setFieldErrors(fieldErrors);
 
+        Map<String, String> fieldErrors = new HashMap<>();
+
+        if (ex instanceof MethodArgumentNotValidException validationEx) {
+            apiError.setMessage("Validation error");
+            validationEx.getBindingResult().getFieldErrors().forEach(error -> {
+                fieldErrors.put(error.getField(), error.getDefaultMessage());
+            });
+        } else if (ex instanceof HttpMessageNotReadableException) {
+            apiError.setMessage("Invalid JSON data");
+
+            fieldErrors.put("category", "Invalid category value");
+        }
+
+        apiError.setFieldErrors(fieldErrors);
         return ResponseEntity.badRequest().body(apiError);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiError> handleValidationExceptions(
-            HttpMessageNotReadableException ex, WebRequest request) {
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiError> handleHttpRequestMethodNotSupported(
+            HttpRequestMethodNotSupportedException ex,
+            WebRequest request) {
+
+        HttpStatus status = HttpStatus.METHOD_NOT_ALLOWED;
 
         ApiError apiError = new ApiError();
-        apiError.setStatus(HttpStatus.BAD_REQUEST);
-        apiError.setMessage("Invalid JSON data");
         apiError.setTimestamp(LocalDateTime.now());
+        apiError.setMessage(String.format(
+                "Method '%s' is not supported for this endpoint",
+                ex.getMethod()
+        ));
         apiError.setPath(request.getDescription(false).replace("uri=", ""));
 
         Map<String, String> fieldErrors = new HashMap<>();
-        if (ex.getCause() instanceof JsonMappingException jsonEx) {
-            String fieldName = jsonEx.getPath().isEmpty() ? "request" : jsonEx.getPath().get(0).getFieldName();
-            fieldErrors.put(fieldName, jsonEx.getOriginalMessage());
-        } else {
-            fieldErrors.put("request", ex.getMessage());
-        }
+        fieldErrors.put("httpMethod", "Unsupported HTTP method");
         apiError.setFieldErrors(fieldErrors);
 
-        return ResponseEntity.badRequest().body(apiError);
+        return new ResponseEntity<>(apiError, status);
     }
 }
