@@ -21,7 +21,7 @@ services:
       retries: 10
 
   app:
-    image: arslan1211/menu-manager:0.0.1
+    image: arslan1211/menu-manager:0.0.2 # 0.0.2 для linux/arm64 / 0.0.1 для windows
     depends_on:
       postgres:
         condition: service_healthy
